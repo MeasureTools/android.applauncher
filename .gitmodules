@@ -1,0 +1,3 @@
+[submodule "lib/framework"]
+	path = lib/framework
+	url = git@gitos.cs.tu-dortmund.de:grimgal/framework.git

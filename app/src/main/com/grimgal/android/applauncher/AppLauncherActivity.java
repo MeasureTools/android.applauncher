@@ -14,7 +14,7 @@
  * limitations under the License.
  **/
 
-package info.eismango.applauncher;
+package com.grimgal.android.applauncher;
 
 import android.net.Uri;
 import android.content.ComponentName;
@@ -50,10 +50,10 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.IValueSupplierManager;
 
-import info.eismango.grimgal.*;
+import com.grimgal.android.framework.*;
 
 public class AppLauncherActivity extends Activity {
-	
+
 	private String storagePath;
 
 	List<Button> buttons = new ArrayList<Button>();
@@ -63,7 +63,7 @@ public class AppLauncherActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
-		
+
 		int[] arr = {33, 23, 29, 30, 22, 18, 21, 190, 191, 192, 174, 173, 171, 172, 189, 210, 209, 19, 28, 31, 25, 24};
 		for (int i : arr) {
 			GPIO g = GPIO.create(i);
@@ -72,9 +72,9 @@ public class AppLauncherActivity extends Activity {
 				g.setValue(false);
 			}
 		}
-		
+
 		// ###### Layout [BEGIN] ######
-		
+
 		this.layout = new LinearLayout(this);
 		{
 			this.layout.setOrientation(LinearLayout.VERTICAL);
@@ -93,45 +93,45 @@ public class AppLauncherActivity extends Activity {
 		List<ResolveInfo> resInfoList = pm.queryIntentActivities(mainIntent, 0);
 		for (final ResolveInfo resInfo : resInfoList) {
 			final String appName = (resInfo.loadLabel(pm)).toString();
-			
+
 			Button button = new Button(this);
 			{
 				button.setHeight(20);
 				button.setWidth(200);
 				//button.setTag(this.buttons.size());
 				button.setText(appName);
-				
+
 				OnClickListener buttonClicked = new OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						String prefix = appName + "_" + System.currentTimeMillis();
 						//Start all Logger
 						try {
-							info.eismango.grimgal.Framework.init(storagePath, prefix);
+							com.grimgal.android.framework.Framework.init(storagePath, prefix);
 							IValueSupplierManager ivsm = IValueSupplierManager.Stub.asInterface(ServiceManager.getService("VALUE_SUPPLIER_MANAGER"));
 							if (ivsm == null) {
-								info.eismango.grimgal.Log.e("supplier","ivsm was null");
+								com.grimgal.android.framework.Log.e("supplier","ivsm was null");
 							}
 							String[] services = ivsm.list();
-							info.eismango.grimgal.Log.v("AppLauncher","Found " +services.length+" Suppliers");
+							com.grimgal.android.framework.Log.v("AppLauncher","Found " +services.length+" Suppliers");
 							for(int k =0 ; k < services.length ; k++) {
-								info.eismango.grimgal.Log.v("supplier",services[k]);
+								com.grimgal.android.framework.Log.v("supplier",services[k]);
 							}
 							for(int k =0 ; k < services.length ; k++) {
-								info.eismango.grimgal.ValueLog.run(services[k], 100, java.util.concurrent.TimeUnit.MILLISECONDS);
+								com.grimgal.android.framework.ValueLog.run(services[k], 100, java.util.concurrent.TimeUnit.MILLISECONDS);
 							}
 						}
 						catch (IOException e) {
-							info.eismango.grimgal.Log.e("AppLauncher",e.toString());
+							com.grimgal.android.framework.Log.e("AppLauncher",e.toString());
 							//...
 						}
 						catch (RemoteException e2) {
-							info.eismango.grimgal.Log.e("AppLauncher",e2.toString());
+							com.grimgal.android.framework.Log.e("AppLauncher",e2.toString());
 						}
 						catch (Exception e3) {
-							info.eismango.grimgal.Log.e("AppLauncher",e3.toString());
+							com.grimgal.android.framework.Log.e("AppLauncher",e3.toString());
 						}
-						
+
 						ActivityInfo activity = resInfo.activityInfo;
 						ComponentName componentName = new ComponentName(activity.applicationInfo.packageName, activity.name);
 						Intent appIntent = new Intent(Intent.ACTION_MAIN);
@@ -146,7 +146,7 @@ public class AppLauncherActivity extends Activity {
 						GPIO g19 = GPIO.create(19);
 						g19.setOut();
 						g19.setValue(true);
-						
+
 						startActivity(appIntent);
 					}
 				};
@@ -156,8 +156,8 @@ public class AppLauncherActivity extends Activity {
 			this.buttons.add(button);
 		}
 		// ###### Layout [END] ######
-	
+
 		this.storagePath = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
 	}
-	
+
 }
